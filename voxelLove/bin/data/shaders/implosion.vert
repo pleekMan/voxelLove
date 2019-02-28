@@ -7,10 +7,10 @@ const float TWO_PI = PI * 2.;
 const float HALF_PI = 1.57079632679489661923;
 const float QUARTER_PI = 0.785398163397448309616;
 
+uniform float time;
+uniform vec3 uvwControl;
 uniform vec2 mouse;
 uniform vec2 resolution;
-uniform float uTime;
-uniform float vTime;
 
 vec4 scale(vec4 point, vec3 factor){
 
@@ -47,17 +47,17 @@ void main() {
   vec2 normMouse = mouse / resolution;
   //vec2 mouseCentered = (normMouse * 2.) - vec2(1.);
   //mouseCentered.y = 1. - mouseCentered.y;
-  float time = uTime * 0.01;
+  float time = time * 0.005;
 
   float distToCorner = distance(vec3(0),vec3(1));
 
   vec4 positivePoint = abs(vCentered);
   //vec4 positivePoint = abs(vCenteredCycle);
   //vec4 threshold = vec4(vec3(normMouse.y),0.);
-  //vec4 threshold = vec4(vec3(fract(uTime)),0.);
+  //vec4 threshold = vec4(vec3(fract(uvwControl.x)),0.);
   vec4 threshold = vec4(vec3(fract(time) * distToCorner),0.);
 
-  float limit = vTime ;
+  float limit = uvwControl.y;
   float distToPoint = distance(vec4(0),positivePoint);
   float distToThreshold = distance(vec4(0),threshold); // REDUNDANT
 

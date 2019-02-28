@@ -8,7 +8,7 @@ void ofApp::setup(){
     shader.load("shaders/implosion.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
     
     // CAMERA SETUP
-    cam.setAutoDistance(false);
+    //cam.setAutoDistance(false);
     float pseudoDistance = 280;
     float yOffset = 0;
     camPos = ofVec3f(pseudoDistance);
@@ -17,15 +17,17 @@ void ofApp::setup(){
     //cam.lookAt(ofVec3f(0,30,0)); // AT draw(). OTHERWISE, NOT WORKING..
     cam.setNearClip(10.f);
     cam.setFarClip(10000.f);
-    cam.disableMouseInput();
+    //cam.disableMouseInput();
     //cam.setPosition(camPos);
     //cam.rotateAround(20, ofVec3f(0,1,0), ofVec3f(0));
     
     
     
     // GUI STUFF
+    showGui = true;
     gui.setup();
-    gui.add(uvwSlider.setup("U|V|W", ofVec3f(0.5), ofVec3f(0), ofVec3f(1)));
+    gui.add(uvwSlider.setup("U|V|W", ofVec3f(0.0), ofVec3f(-1), ofVec3f(1)));
+    gui.add(lockCamera.setup("CAMERA LOCK", true));
     
     
     // SETUP VOXEL CUBE
@@ -55,32 +57,25 @@ void ofApp::draw(){
     ofSetWindowTitle(ofToString(ofGetFrameRate()));
     
     
-    float uTime = ofGetFrameNum();
-    //float vTime = ofGetFrameNum() * 0.001;
-    //float wTime = ofGetFrameNum() * 0.001;
+    float time = ofGetFrameNum();
     
+    if(lockCamera){
+        cam.setPosition(camPos);
+        cam.lookAt(camLookAt);
+    }
     
-    //float uTime = uvwSlider->x;
-    //float vTime = uvwSlider->y;
-    //float wTime = uvwSlider->z;
-    
-    cam.setPosition(camPos);
-    cam.lookAt(camLookAt);
     cam.begin();
+    
+    shader.begin();
+    shader.setUniform1f("time", time);
+    shader.setUniform3f("uvwControl", ofVec3f(uvwSlider->x, uvwSlider->y, uvwSlider->z));
+    shader.setUniform2f("mouse", ofGetMouseX(), ofGetMouseY());
+    shader.setUniform2f("resolution", ofGetWindowSize());
     
     //ofDrawAxis(10);
     
-    shader.begin();
-    //shader.setUniform2f("mouse", ofGetMouseX(), ofGetMouseY());
-    //shader.setUniform2f("resolution", ofGetWindowSize());
-    shader.setUniform1f("uTime", uTime);
-    //shader.setUniform1f("vTime", vTime);
-    //shader.setUniform1f("wTime", wTime);
-    
-    
     vbo.drawElements(GL_POINTS, TOTAL_RES);
   
-    
     shader.end();
     cam.end();
     
@@ -93,6 +88,9 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
     if (key == 'c' || key == 'C')camPos *= ofVec3f(-1,1,-1);
     //cout << "Setting camPos => " + ofToString(camPos) << endl;
+    if (key == 'g' || key == 'G')showGui = !showGui;
+    if (key == 'l' || key == 'L')lockCamera = !lockCamera;
+
     
 }
 

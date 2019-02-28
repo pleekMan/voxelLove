@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 
-#define RES_ALL 200
+#define RES_ALL 160
 #define RES_Z RES_ALL
 #define RES_Y RES_ALL
 #define RES_X RES_ALL
@@ -41,7 +41,8 @@ public:
     ofxPanel gui;
     bool showGui;
     ofxVec3Slider uvwSlider;
-    ofxFloatSlider camDistance;
+    //ofxFloatSlider camDistance;
+    ofxToggle lockCamera;
     
     
 };
