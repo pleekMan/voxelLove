@@ -9,7 +9,7 @@ const float QUARTER_PI = 0.785398163397448309616;
 
 uniform vec2 mouse;
 uniform vec2 resolution;
-//uniform float uTime;
+uniform float time;
 //uniform float vTime;
 
 vec3 mod289(vec3 x) {
@@ -134,26 +134,24 @@ void main() {
 
 	vec4 vCentered = (gl_Vertex * 2.) - vec4(1.);
   //vCentered.y = vCentered.y * 0.5 + 0.5;
-  //vec4 vCenteredCycle = fract(vCentered * 2.);
   vec2 normMouse = mouse / resolution;
   //vec2 mouseCentered = (normMouse * 2.) - vec2(1.);
   //mouseCentered.y = 1. - mouseCentered.y;
 
   
-  float noiseStrength = snoise(vCentered.xyz + vec3(normMouse.y));
+  float noiseStrength = snoise(vCentered.xyz + vec3(time * 0.02));
   noiseStrength = ((noiseStrength + 1.) * 0.5) * 4.;
-
+  
   vec4 pushed = scale(vCentered, vec3(noiseStrength));
-
-  vec4 scaled = scale(pushed, vec3(100.) );
+  vec4 pushedSigned = abs(pushed);
+  vec4 pushedConstrained = min((1. / vCentered) , pushedSigned);
+  pushedConstrained *= sign(pushed);
+  vec4 scaled = scale(pushedConstrained, vec3(100.) );
   
 
 	vec4 finalPos = gl_ProjectionMatrix  * gl_ModelViewMatrix * scaled;
   gl_Position = finalPos;
 
-	//gl_Color is the color of the Vertex (needs to be, otherWise = black) (passed onto frag)
-	//gl_Color is read-only (used as a pass-through). Use gl_FrontColor instead;
-	//vec2 screenAndMousePosX = (mouse + (gl_ModelViewMatrix * vertexInModelSpace).xy) * 0.01;
 	
 	gl_FrontColor = gl_Vertex;		
 }

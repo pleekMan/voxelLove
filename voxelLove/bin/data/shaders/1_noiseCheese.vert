@@ -7,10 +7,10 @@ const float TWO_PI = PI * 2.;
 const float HALF_PI = 1.57079632679489661923;
 const float QUARTER_PI = 0.785398163397448309616;
 
+uniform float time;
+uniform vec3 uvwControl;
 uniform vec2 mouse;
 uniform vec2 resolution;
-//uniform float uTime;
-//uniform float vTime;
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -104,29 +104,14 @@ float snoise(vec3 v)
                                 dot(p2,x2), dot(p3,x3) ) );
   }
 
-vec4 rotatedX (vec4 point, float angle){
 
-	float c = cos(angle);
-	float s = sin(angle);
-
-	mat4 rotXMatrix;
-	rotXMatrix[0] = vec4(1.,0.,0.,0.);
-	rotXMatrix[1] = vec4(0.,c,-s,0.);
-	rotXMatrix[2] = vec4(0.,s,c,0.);
-	rotXMatrix[3] = vec4(0.,0.,0.,1.);
-
-	return rotXMatrix * point;
-}
-
-vec4 scale(vec4 point, vec3 factor){
-
-  mat4 scaleMatrix;
-	scaleMatrix[0] = vec4(factor.x,0.,0.,0.);
-	scaleMatrix[1] = vec4(0.,factor.y,0.,0.);
-	scaleMatrix[2] = vec4(0.,0.,factor.z,0.);
-	scaleMatrix[3] = vec4(0.,0.,0.,1.);
-
-	return scaleMatrix * point;
+mat4 scale(vec3 factor){
+  return mat4(
+    vec4(factor.x,0.,0.,0.),
+    vec4(0.,factor.y,0.,0.),
+    vec4(0.,0.,factor.z,0.),
+    vec4(0.,0.,0.,1.)
+  );
 }
 
 
@@ -134,33 +119,20 @@ void main() {
 
 	vec4 vCentered = (gl_Vertex * 2.) - vec4(1.);
   vCentered.y = vCentered.y * 0.5 + 0.5;
-  //vec4 vCenteredCycle = fract(vCentered * 2.);
   vec2 normMouse = mouse / resolution;
   //vec2 mouseCentered = (normMouse * 2.) - vec2(1.);
   //mouseCentered.y = 1. - mouseCentered.y;
-
   
-  //float fallShape = vCentered.y - (normMouse.y * 0.5);
-  //float verticalPushShape = impulse(vCentered.y, 1.1, 5.);
-  
-  float noiseStrength = snoise(vCentered.xyz + vec3(normMouse.y));
-  //noiseStrength = noiseStrength * 0.5 + 0.5;
-  vec4 pushVector  = (vCentered - vec4(0)) * 2.0; // CHEESE
-  //vec4 pushVector  = (vCentered - vec4(0));
+  float noiseStrength = snoise((vCentered.xyz * (uvwControl.z * 20.)) + (time * uvwControl.x * 0.1));
+  vec4 pushVector  = (vCentered - vec4(0)) * (uvwControl.y * 10.); // CHEESE
   
   vec4 pushed = vCentered + (pushVector * noiseStrength);
-  //pushed.y = clamp(pushed.y, 0 ,1);
-  //pushed.y = clamp(pushed.y - normMouse.y,0.,1.);
 
-  vec4 scaled = scale(pushed, vec3(100.) );
+  vec4 scaled = scale(vec3(100.)) * pushed;
   
 
 	vec4 finalPos = gl_ProjectionMatrix  * gl_ModelViewMatrix * scaled;
-  gl_Position = finalPos;
-
-	//gl_Color is the color of the Vertex (needs to be, otherWise = black) (passed onto frag)
-	//gl_Color is read-only (used as a pass-through). Use gl_FrontColor instead;
-	//vec2 screenAndMousePosX = (mouse + (gl_ModelViewMatrix * vertexInModelSpace).xy) * 0.01;
-	
-	gl_FrontColor = gl_Vertex;		
+  gl_Position = finalPos;	
+	gl_FrontColor = gl_Vertex; // gl_Vertex -> read-only
+		
 }

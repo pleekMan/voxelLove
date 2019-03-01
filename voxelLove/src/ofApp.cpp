@@ -5,7 +5,7 @@ void ofApp::setup(){
     ofBackground(0);
     
     // LOAD SHADER
-    shader.load("shaders/implosion.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
+    shader.load("shaders/4_noise3D_InfinityMirror.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
     
     // CAMERA SETUP
     //cam.setAutoDistance(false);
@@ -26,7 +26,7 @@ void ofApp::setup(){
     // GUI STUFF
     showGui = true;
     gui.setup();
-    gui.add(uvwSlider.setup("U|V|W", ofVec3f(0.0), ofVec3f(-1), ofVec3f(1)));
+    gui.add(uvwSlider.setup("U|V|W", ofVec3f(0.5), ofVec3f(-1), ofVec3f(1)));
     gui.add(lockCamera.setup("CAMERA LOCK", true));
     
     
@@ -57,22 +57,22 @@ void ofApp::draw(){
     ofSetWindowTitle(ofToString(ofGetFrameRate()));
     
     
-    float time = ofGetFrameNum();
-    
     if(lockCamera){
         cam.setPosition(camPos);
         cam.lookAt(camLookAt);
     }
     
+    
+    //cam.setDistance((ofGetFrameNum() * ofGetFrameNum()) * 0.05);
     cam.begin();
     
     shader.begin();
-    shader.setUniform1f("time", time);
-    shader.setUniform3f("uvwControl", ofVec3f(uvwSlider->x, uvwSlider->y, uvwSlider->z));
+    shader.setUniform1f("time", ofGetFrameNum());
+    shader.setUniform3f("uvwControl", uvwSlider);
     shader.setUniform2f("mouse", ofGetMouseX(), ofGetMouseY());
     shader.setUniform2f("resolution", ofGetWindowSize());
     
-    //ofDrawAxis(10);
+    //ofDrawAxis(50);
     
     vbo.drawElements(GL_POINTS, TOTAL_RES);
   
@@ -86,13 +86,23 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    if (key == 'c' || key == 'C')camPos *= ofVec3f(-1,1,-1);
-    //cout << "Setting camPos => " + ofToString(camPos) << endl;
+    if (key == 'i' || key == 'I')camPos *= ofVec3f(-1,1,-1);
     if (key == 'g' || key == 'G')showGui = !showGui;
     if (key == 'l' || key == 'L')lockCamera = !lockCamera;
+    if (key == 'c' || key == 'C')hideCursorPressed();
 
-    
+
 }
+
+bool ofApp::hideCursorPressed(){
+    if (isCursorHidden) {
+        ofShowCursor();
+    } else {
+        ofHideCursor();
+    }
+    return isCursorHidden = !isCursorHidden;
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
@@ -111,12 +121,12 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    
+
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    
+
 }
 
 //--------------------------------------------------------------

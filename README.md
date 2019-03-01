@@ -1,6 +1,7 @@
 # voxelLove
 
-Experiments over a Cubic Voxel Space
+Experiments over a Cubic Voxel Space, using only vertex shaders.
+The cube holds 4.096.000 vertices (160<sup>3</sup>).
 ___
 
 

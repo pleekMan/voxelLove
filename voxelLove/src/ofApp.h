@@ -28,6 +28,8 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
+    bool hideCursorPressed();
+    
     ofShader shader;
     ofVbo vbo;
     
@@ -41,8 +43,7 @@ public:
     ofxPanel gui;
     bool showGui;
     ofxVec3Slider uvwSlider;
-    //ofxFloatSlider camDistance;
     ofxToggle lockCamera;
-    
+    bool isCursorHidden;
     
 };
