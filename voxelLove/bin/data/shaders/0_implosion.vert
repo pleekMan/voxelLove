@@ -45,5 +45,5 @@ void main() {
 	vec4 finalPos = gl_ProjectionMatrix  * gl_ModelViewMatrix * scaled;
   gl_Position = finalPos;
 	
-	gl_FrontColor = gl_Vertex; // gl_Vertex -> read-only
+	gl_FrontColor = gl_Vertex; // gl_Color -> read-only
 }

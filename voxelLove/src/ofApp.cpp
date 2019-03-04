@@ -5,7 +5,7 @@ void ofApp::setup(){
     ofBackground(0);
     
     // LOAD SHADER
-    shader.load("shaders/4_noise3D_InfinityMirror.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
+    shader.load("shaders/8_moebius.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
     
     // CAMERA SETUP
     //cam.setAutoDistance(false);
@@ -24,9 +24,9 @@ void ofApp::setup(){
     
     
     // GUI STUFF
-    showGui = true;
+    showGui = false;
     gui.setup();
-    gui.add(uvwSlider.setup("U|V|W", ofVec3f(0.5), ofVec3f(-1), ofVec3f(1)));
+    gui.add(uvwSlider.setup("A|B|C", ofVec3f(0.0), ofVec3f(-1), ofVec3f(1)));
     gui.add(lockCamera.setup("CAMERA LOCK", true));
     
     
@@ -66,13 +66,15 @@ void ofApp::draw(){
     //cam.setDistance((ofGetFrameNum() * ofGetFrameNum()) * 0.05);
     cam.begin();
     
+    //ofDrawAxis(50);
+
+    
     shader.begin();
     shader.setUniform1f("time", ofGetFrameNum());
     shader.setUniform3f("uvwControl", uvwSlider);
     shader.setUniform2f("mouse", ofGetMouseX(), ofGetMouseY());
     shader.setUniform2f("resolution", ofGetWindowSize());
     
-    //ofDrawAxis(50);
     
     vbo.drawElements(GL_POINTS, TOTAL_RES);
   

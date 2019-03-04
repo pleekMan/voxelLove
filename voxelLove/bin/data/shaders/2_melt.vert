@@ -5,10 +5,10 @@ const float TWO_PI = PI * 2.;
 const float HALF_PI = 1.57079632679489661923;
 const float QUARTER_PI = 0.785398163397448309616;
 
+uniform float time;
+uniform vec3 uvwControl;
 uniform vec2 mouse;
 uniform vec2 resolution;
-//uniform float uTime;
-//uniform float vTime;
 
 mat4 scale(vec3 factor){
   return mat4(
