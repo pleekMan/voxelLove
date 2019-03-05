@@ -1,0 +1,230 @@
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <title>Create Triangle With Coloured Vertices</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+
+    <script src="js/libs/three.js"></script>
+    <script src="js/libs/OrbitControls.js"></script>
+
+
+
+</head>
+
+<body>
+
+    <!-- SHADER - VERTEX -->
+    <script type="x-shader/x-vertex" id="vertexShader">
+        varying vec3 vColor;
+        void main() {
+            // position (vec3) is the vertex input attribute, in model space
+            
+            vColor = color;
+
+            vec4 finalPos = vec4(position.x * position.y, position.y, position.z, 1.0);
+            gl_Position = projectionMatrix * modelViewMatrix * finalPos;
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        uniform sampler2D texture;
+        varying vec3 vColor;
+        void main() {
+            gl_FragColor = vec4( vColor, 1.0 );
+            //gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+        }
+    </script>
+
+        
+    <script>
+
+        var scene, camera, light;
+        var renderer;
+
+        var voxelCube; // type: Points. [A Object3D class for displaying meshes as points (with gl_Points)]
+        var vertexDensity = 100.0;
+
+        setup();
+        animate();
+
+        function setup(){
+            // EVENT LISTENERS
+            document.addEventListener('mousedown', onMouseDown, false);
+            document.addEventListener("keypress", onKeyPressed, false);
+            window.addEventListener("load", onWinLoad, false);
+
+            // DEV TOOLS
+            //var stats;
+            //initStatsPanel();
+
+            // SETUP - BEGIN
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            light = new THREE.AmbientLight(0x404040); // soft white light
+            scene.add(light);
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // CAM ORBITER
+            var camOrbit = new THREE.OrbitControls(camera, renderer.domElement);
+            camera.position.set(2,2,2);
+            camOrbit.update(); // CALL AFTER MANUALLY SETTING THE CAMERA
+
+
+            // SETUP - END
+
+            scene.add(new THREE.AxesHelper(1));
+
+            setupVoxelCube();
+
+            //createTriangleWithColouredVertices();
+        }
+
+
+
+        function draw() {
+
+        }
+
+        function animate() {
+
+            draw();
+
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+
+        }
+
+
+
+        // MY FUNCTIONS
+
+        function setupVoxelCube(){
+
+            var positions = [];
+			var colors = [];
+			var sizes = [];
+
+            var geometry = new THREE.BufferGeometry();
+            var color = new THREE.Color();
+
+
+            var separation = 1.0 / vertexDensity;
+            //var separation = 1.0 / vertexDensity;
+            for (var z = 0; z < vertexDensity; z++) {
+                for (var y = 0; y < vertexDensity; y++) {
+                    for (var x = 0; x < vertexDensity; x++) {
+
+                        //var arrayPos = x + (y*RES_X) + (z*RES_X*RES_Y);
+                        positions.push(x * separation, y * separation, z * separation);
+
+                        color.setRGB(x / vertexDensity, y / vertexDensity, z / vertexDensity);
+                        colors.push(color.r, color.g, color.b);
+
+                        sizes.push(2);
+
+                    }
+                }
+            }
+
+
+            geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ));//.setDynamic( true ) );
+
+            //material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors});
+
+            var shaderMaterial = new THREE.ShaderMaterial( {
+				//uniforms: uniforms,
+				vertexShader: document.getElementById( 'vertexShader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+				//blending: THREE.AdditiveBlending,
+				depthTest: false,
+				transparent: true,
+				vertexColors: true
+			} );
+
+            voxelCube = new THREE.Points(geometry, shaderMaterial);
+
+            scene.add(voxelCube);
+        }
+
+        function createTriangleWithColouredVertices() {
+
+            // Triangle Mesh
+            var material, geometry, mesh;
+            material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors, side: THREE.DoubleSide });
+            geometry = new THREE.Geometry();
+
+            geometry.vertices.push(new THREE.Vector3(100, 0, 0));
+            geometry.vertices.push(new THREE.Vector3(0, 100, 0));
+            geometry.vertices.push(new THREE.Vector3(0, 0, 100));
+
+            geometry.faces.push(new THREE.Face3(0,1,2));
+
+            // COLORS FOR VERTICES
+            var color1 = new THREE.Color(0xFF0000);
+            var color2 = new THREE.Color(0x00FF00);
+            var color3 = new THREE.Color(0x0000FF);
+
+            geometry.faces[0].vertexColors = [color1, color2, color3];
+
+            mesh = new THREE.Mesh(geometry, material);
+
+            scene.add(mesh);
+
+        }
+
+
+        // EVENTS
+        function onMouseDown(event) {
+
+            event.preventDefault();
+
+            switch (event.which) {
+                case 1: // left mouse click
+                    break;
+
+                case 3: // right mouse click
+                    break;
+            }
+
+        }
+
+        function onKeyPressed(key) {
+            //console.log("Event Input key: " + key);
+
+            var keyCode = key.keyCode;
+            console.log("KeyCode: " + keyCode);
+            var keyChar = String.fromCharCode(key.keyCode);
+            console.log("KeyChar: " + keyChar);
+
+
+            if (keyChar === " ") {
+
+            }
+        }
+
+        // OTHER FUNCTIONS
+
+
+        function onWinLoad() {
+
+        }
+
+    </script>
+</body>
+
+</html>

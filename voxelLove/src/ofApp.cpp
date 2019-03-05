@@ -5,7 +5,7 @@ void ofApp::setup(){
     ofBackground(0);
     
     // LOAD SHADER
-    shader.load("shaders/8_moebius.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
+    shader.load("shaders/9_ stretch.vert","shaders/shader.frag"); // REPLACE WITH THE DIFFERENT SHADER IN THE FOLDER
     
     // CAMERA SETUP
     //cam.setAutoDistance(false);
@@ -26,7 +26,7 @@ void ofApp::setup(){
     // GUI STUFF
     showGui = false;
     gui.setup();
-    gui.add(uvwSlider.setup("A|B|C", ofVec3f(0.0), ofVec3f(-1), ofVec3f(1)));
+    gui.add(controlSlider.setup("A|B|C", ofVec3f(0.0), ofVec3f(-1), ofVec3f(1)));
     gui.add(lockCamera.setup("CAMERA LOCK", true));
     
     
@@ -71,7 +71,7 @@ void ofApp::draw(){
     
     shader.begin();
     shader.setUniform1f("time", ofGetFrameNum());
-    shader.setUniform3f("uvwControl", uvwSlider);
+    shader.setUniform3f("control", controlSlider);
     shader.setUniform2f("mouse", ofGetMouseX(), ofGetMouseY());
     shader.setUniform2f("resolution", ofGetWindowSize());
     

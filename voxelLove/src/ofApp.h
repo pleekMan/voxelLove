@@ -42,7 +42,7 @@ public:
     
     ofxPanel gui;
     bool showGui;
-    ofxVec3Slider uvwSlider;
+    ofxVec3Slider controlSlider;
     ofxToggle lockCamera;
     bool isCursorHidden;
     
